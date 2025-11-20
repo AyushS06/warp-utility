@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { CalculatorProvider } from "@/contexts/calculator-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,11 @@ export default function RootLayout({
           src="https://tweakcn.com/live-preview.min.js"
         />
       </head>
-      <body className="font-sans">
-        <Navbar />
-        {children}
+      <body className="font-sans" suppressHydrationWarning>
+        <CalculatorProvider>
+          <Navbar />
+          {children}
+        </CalculatorProvider>
       </body>
     </html>
   )

@@ -2,8 +2,6 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Navbar() {
@@ -26,10 +24,6 @@ export function Navbar() {
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button size="icon" title="Create headcount report">
-            <Plus className="h-4 w-4" />
-            <span className="sr-only">Create headcount report</span>
-          </Button>
         </div>
       </div>
     </nav>
