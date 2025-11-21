@@ -62,7 +62,7 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
         <DialogHeader>
           <DialogTitle>PDF Preview</DialogTitle>
           <DialogDescription>
-            Preview of your headcount planner report
+            Sign up with warp to share your report with your team!
           </DialogDescription>
         </DialogHeader>
 
