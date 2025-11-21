@@ -1,11 +1,30 @@
 import { z } from "zod"
 
+const isoDateSchema = z
+  .string()
+  .min(1, "Date is required")
+  .refine((value) => !Number.isNaN(Date.parse(value)), {
+    message: "Invalid date",
+  })
+
 export const financialInputsSchema = z.object({
   totalCashOnHand: z.coerce.number().min(0),
   monthlyExistingBurn: z.coerce.number().min(0),
   expectedMonthlyRevenue: z.coerce.number().min(0),
   targetRunwayMonths: z.coerce.number().min(1),
   contingencyBufferPercent: z.coerce.number().min(0).max(100),
+  companyValuation: z.coerce.number().min(0),
+  startingCashBalance: z.coerce.number().min(0),
+  endingCashBalance: z.coerce.number().min(0),
+  periodStartDate: isoDateSchema,
+  periodEndDate: isoDateSchema,
+  monthlyCashSales: z.coerce.number().min(0),
+  otherMonthlyCashIncome: z.coerce.number().min(0),
+  rentAndUtilities: z.coerce.number().min(0),
+  officeSuppliesAndEquipment: z.coerce.number().min(0),
+  marketingExpenses: z.coerce.number().min(0),
+  travelExpenses: z.coerce.number().min(0),
+  otherCashExpenses: z.coerce.number().min(0),
 })
 
 export const roleSchema = z.object({
@@ -14,10 +33,15 @@ export const roleSchema = z.object({
   category: z
     .enum([
       "engineering",
-      "sales",
-      "design",
       "product",
+      "sales",
       "marketing",
+      "people",
+      "talent",
+      "gtm",
+      "ml",
+      "research",
+      "design",
       "operations",
       "finance",
       "hr",

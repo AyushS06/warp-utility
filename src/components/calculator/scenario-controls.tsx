@@ -11,16 +11,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import type { CalculatorFormValues } from "@/lib/schemas/calculator"
 
 const runwayOptions = [12, 18, 24, 36]
-const growthModes = [
-  { label: "Cash-efficient", value: "cash-efficient" },
-  { label: "Growth mode", value: "growth" },
-  { label: "AI assist", value: "ai" },
-]
 
 type ScenarioControlsProps = {
   form: UseFormReturn<CalculatorFormValues>
@@ -92,31 +86,6 @@ export function ScenarioControlsSection({ form }: ScenarioControlsProps) {
                 </Button>
               ))}
             </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="scenario.growthMode"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Planning mode</FormLabel>
-            <FormControl>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full sm:w-64">
-                  <SelectValue placeholder="Select mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  {growthModes.map((mode) => (
-                    <SelectItem key={mode.value} value={mode.value}>
-                      {mode.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
             <FormMessage />
           </FormItem>
         )}

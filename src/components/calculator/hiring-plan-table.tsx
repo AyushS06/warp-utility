@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { FormattedNumberInput } from "@/components/ui/formatted-number-input"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 import {
   Select,
   SelectContent,
@@ -36,6 +40,79 @@ const employmentOptions = [
   { label: "Contractor", value: "contractor" },
   { label: "Part-time", value: "part-time" },
 ]
+
+function DatePickerInput({
+  value,
+  onChange,
+  compact = false,
+}: {
+  value: string
+  onChange: (value: string) => void
+  compact?: boolean
+}) {
+  const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
+  const calendarRef = React.useRef<HTMLDivElement>(null)
+  const dateValue = value ? new Date(value) : undefined
+
+  // Close calendar when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        setIsCalendarOpen(false)
+      }
+    }
+
+    if (isCalendarOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [isCalendarOpen])
+
+  return (
+    <div className="relative" ref={calendarRef}>
+      <Button
+        type="button"
+        variant="outline"
+        className={cn(
+          "w-full justify-start text-left font-normal",
+          compact && "h-9",
+          !dateValue && "text-muted-foreground"
+        )}
+        onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+      >
+        <CalendarIcon className={cn("mr-2", compact ? "h-3.5 w-3.5" : "h-4 w-4")} />
+        {dateValue ? (
+          <span className={compact ? "text-xs" : ""}>
+            {format(dateValue, compact ? "MMM d, yyyy" : "PPP")}
+          </span>
+        ) : (
+          <span className={compact ? "text-xs" : ""}>Pick date</span>
+        )}
+      </Button>
+      {isCalendarOpen && (
+        <div className="absolute z-50 mt-1 bg-popover border border-border rounded-md shadow-md">
+          <Calendar
+            mode="single"
+            selected={dateValue}
+            onSelect={(date) => {
+              if (date) {
+                onChange(date.toISOString().split("T")[0])
+                setIsCalendarOpen(false)
+              }
+            }}
+            initialFocus
+          />
+        </div>
+      )}
+    </div>
+  )
+}
 
 type HiringPlanTableProps = {
   form: UseFormReturn<CalculatorFormValues>
@@ -201,7 +278,11 @@ export function HiringPlanTable({ form }: HiringPlanTableProps) {
                       <FormItem>
                         <FormLabel className="sr-only">Hiring date</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <DatePickerInput
+                            value={field.value}
+                            onChange={field.onChange}
+                            compact
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

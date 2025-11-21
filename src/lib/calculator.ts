@@ -6,6 +6,9 @@ import type {
   RoleInput,
   ScenarioSettings,
   SensitivityBand,
+  CoreBurnMetrics,
+  DetailedIncomeMetrics,
+  DetailedExpenseMetrics,
 } from "@/lib/types"
 
 const EMPLOYMENT_TYPE_MULTIPLIER = {
@@ -25,7 +28,8 @@ function getLocationData(
 
 function calculateRoleCostBreakdown(
   role: RoleInput,
-  locations: LocationMultiplier[]
+  locations: LocationMultiplier[],
+  companyValuation: number
 ): RoleCostBreakdown {
   const locationData = getLocationData(locations, role.locationId)
   const salaryMultiplier = locationData?.salaryMultiplier ?? 1
@@ -40,11 +44,18 @@ function calculateRoleCostBreakdown(
     adjustedAnnualSalary * (1 + benefitsMultiplier) * role.headcount
   const monthlyFullyLoadedCost = fullyLoadedAnnual / 12
 
+  const hasEquity =
+    typeof role.equityPercentage === "number" && role.equityPercentage > 0
+  const equityValue = hasEquity
+    ? (role.equityPercentage / 100) * companyValuation * role.headcount
+    : 0
+
   return {
     roleId: role.id,
     monthlyBaseCost: (adjustedAnnualSalary / 12) * role.headcount,
     monthlyFullyLoadedCost,
     annualFullyLoadedCost: fullyLoadedAnnual,
+    equityValue,
   }
 }
 
@@ -136,6 +147,97 @@ function calculateSensitivityBands(
   ]
 }
 
+const AVERAGE_DAYS_IN_MONTH = 30.44
+
+function calculateMonthsInPeriod(
+  startDate?: string,
+  endDate?: string
+): number | null {
+  if (!startDate || !endDate) {
+    return null
+  }
+
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null
+  }
+
+  const diffMs = end.getTime() - start.getTime()
+  if (diffMs < 0) {
+    return null
+  }
+
+  const diffDays = diffMs / (1000 * 60 * 60 * 24)
+  return diffDays / AVERAGE_DAYS_IN_MONTH
+}
+
+function calculateCoreBurnMetrics(
+  financialInputs: FinancialInputs
+): CoreBurnMetrics {
+  const monthsInPeriod = calculateMonthsInPeriod(
+    financialInputs.periodStartDate,
+    financialInputs.periodEndDate
+  )
+
+  const averageMonthlyBurnSimple =
+    monthsInPeriod && monthsInPeriod > 0
+      ? (financialInputs.startingCashBalance - financialInputs.endingCashBalance) /
+        monthsInPeriod
+      : null
+
+  const cashRunwaySimple =
+    typeof averageMonthlyBurnSimple === "number" && averageMonthlyBurnSimple > 0
+      ? financialInputs.startingCashBalance / averageMonthlyBurnSimple
+      : null
+
+  return {
+    startingCashBalance: financialInputs.startingCashBalance,
+    endingCashBalance: financialInputs.endingCashBalance,
+    monthsInPeriod,
+    averageMonthlyBurnSimple,
+    cashRunwaySimple,
+  }
+}
+
+function calculateIncomeMetrics(
+  financialInputs: FinancialInputs
+): DetailedIncomeMetrics {
+  const totalMonthlyCashIncome =
+    financialInputs.monthlyCashSales + financialInputs.otherMonthlyCashIncome
+
+  return {
+    monthlyCashSales: financialInputs.monthlyCashSales,
+    otherMonthlyCashIncome: financialInputs.otherMonthlyCashIncome,
+    totalMonthlyCashIncome,
+  }
+}
+
+function calculateExpenseMetrics(
+  totalMonthlyHireBurn: number,
+  financialInputs: FinancialInputs
+): DetailedExpenseMetrics {
+  const expenses = {
+    personnelExpenses: totalMonthlyHireBurn,
+    rentAndUtilities: financialInputs.rentAndUtilities,
+    officeSuppliesAndEquipment: financialInputs.officeSuppliesAndEquipment,
+    marketingExpenses: financialInputs.marketingExpenses,
+    travelExpenses: financialInputs.travelExpenses,
+    otherCashExpenses: financialInputs.otherCashExpenses,
+  }
+
+  const totalMonthlyCashExpenses = Object.values(expenses).reduce(
+    (sum, value) => sum + value,
+    0
+  )
+
+  return {
+    ...expenses,
+    totalMonthlyCashExpenses,
+  }
+}
+
 export function calculateMetrics({
   financialInputs,
   roles,
@@ -148,7 +250,7 @@ export function calculateMetrics({
   scenario: ScenarioSettings
 }): CalculatorMetrics {
   const roleCosts = roles.map((role) =>
-    calculateRoleCostBreakdown(role, locations)
+    calculateRoleCostBreakdown(role, locations, financialInputs.companyValuation)
   )
 
   const totalMonthlyHireBurn = roleCosts.reduce(
@@ -175,6 +277,13 @@ export function calculateMetrics({
 
   const maxHires = calculateMaxHires(financialInputs, scenario, roleCosts)
 
+  const coreBurn = calculateCoreBurnMetrics(financialInputs)
+  const incomeBreakdown = calculateIncomeMetrics(financialInputs)
+  const expenseBreakdown = calculateExpenseMetrics(
+    totalMonthlyHireBurn,
+    financialInputs
+  )
+
   return {
     totalMonthlyHireBurn,
     totalMonthlyBurn,
@@ -187,6 +296,9 @@ export function calculateMetrics({
     remainingRunwayMonths: remainingRunway,
     maxHiresForTargetRunway: maxHires,
     sensitivityBands,
+    coreBurn,
+    incomeBreakdown,
+    expenseBreakdown,
   }
 }
 

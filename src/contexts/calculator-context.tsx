@@ -12,8 +12,25 @@ import type {
   RoleInput,
   ScenarioSettings,
 } from "@/lib/types"
+import type { Currency } from "@/lib/currency"
 
 const STORAGE_KEY = "headcount-calculator-state-v1"
+
+function formatIsoDate(date: Date) {
+  return date.toISOString().split("T")[0]
+}
+
+function getDefaultPeriodDates() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+  return {
+    start: formatIsoDate(start),
+    end: formatIsoDate(now),
+  }
+}
+
+const { start: DEFAULT_PERIOD_START, end: DEFAULT_PERIOD_END } =
+  getDefaultPeriodDates()
 
 type PersistedCalculatorState = Omit<CalculatorState, "metrics" | "lastUpdatedIso">
 
@@ -23,6 +40,18 @@ const DEFAULT_FINANCIAL_INPUTS: FinancialInputs = {
   expectedMonthlyRevenue: 50000,
   targetRunwayMonths: 18,
   contingencyBufferPercent: 15,
+  companyValuation: 10000000,
+  startingCashBalance: 500000,
+  endingCashBalance: 200000,
+  periodStartDate: DEFAULT_PERIOD_START,
+  periodEndDate: DEFAULT_PERIOD_END,
+  monthlyCashSales: 50000,
+  otherMonthlyCashIncome: 5000,
+  rentAndUtilities: 15000,
+  officeSuppliesAndEquipment: 8000,
+  marketingExpenses: 12000,
+  travelExpenses: 4000,
+  otherCashExpenses: 6000,
 }
 
 const RESET_FINANCIAL_INPUTS: FinancialInputs = {
@@ -31,6 +60,18 @@ const RESET_FINANCIAL_INPUTS: FinancialInputs = {
   expectedMonthlyRevenue: 0,
   targetRunwayMonths: 18,
   contingencyBufferPercent: 15,
+  companyValuation: 0,
+  startingCashBalance: 0,
+  endingCashBalance: 0,
+  periodStartDate: DEFAULT_PERIOD_START,
+  periodEndDate: DEFAULT_PERIOD_END,
+  monthlyCashSales: 0,
+  otherMonthlyCashIncome: 0,
+  rentAndUtilities: 0,
+  officeSuppliesAndEquipment: 0,
+  marketingExpenses: 0,
+  travelExpenses: 0,
+  otherCashExpenses: 0,
 }
 
 const DEFAULT_SCENARIO: ScenarioSettings = {
@@ -66,6 +107,7 @@ const defaultState = withMetrics({
   roles: [],
   locations: defaultLocations,
   scenario: DEFAULT_SCENARIO,
+  currency: "USD" as Currency,
 }, true)
 
 function loadStateFromStorage(): PersistedCalculatorState | null {
@@ -79,6 +121,10 @@ function loadStateFromStorage(): PersistedCalculatorState | null {
     const parsed = JSON.parse(stored) as PersistedCalculatorState
     if (!parsed.financialInputs || !parsed.locations || !parsed.scenario) {
       return null
+    }
+    // Ensure currency is set, default to USD if missing
+    if (!parsed.currency) {
+      parsed.currency = "USD" as Currency
     }
     return parsed
   } catch (error) {
@@ -97,6 +143,7 @@ function persistState(state: CalculatorState) {
     locations: state.locations,
     roles: state.roles,
     scenario: state.scenario,
+    currency: state.currency,
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
@@ -119,6 +166,7 @@ type CalculatorContextValue = {
   setLocations: (locations: LocationMultiplier[]) => void
   resetCalculator: () => void
   setPlannerOpen: (open: boolean) => void
+  setCurrency: (currency: Currency) => void
 }
 
 const CalculatorContext =
@@ -256,12 +304,23 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
       roles: [],
       locations: resetLocations,
       scenario: DEFAULT_SCENARIO,
+      currency: "USD" as Currency,
     })
     setState(resetState)
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(STORAGE_KEY)
     }
   }, [])
+
+  const setCurrency = React.useCallback(
+    (currency: Currency) => {
+      updateState((prev) => ({
+        ...prev,
+        currency,
+      }))
+    },
+    [updateState]
+  )
 
   const value = React.useMemo<CalculatorContextValue>(
     () => ({
@@ -278,6 +337,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
       setLocations,
       resetCalculator,
       setPlannerOpen,
+      setCurrency,
     }),
     [
       state,
@@ -293,6 +353,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
       setLocations,
       resetCalculator,
       setPlannerOpen,
+      setCurrency,
     ]
   )
 
