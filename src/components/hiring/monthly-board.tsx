@@ -153,7 +153,7 @@ export function MonthlyHiringBoard() {
     : null
 
   if (state.roles.length === 0) {
-    return null
+    return <div className="space-y-4 p-4 text-center text-muted-foreground text-sm">No roles to display</div>
   }
 
   return (

@@ -78,7 +78,9 @@ export function AIInsights() {
   }, [roles, getRoleMonthDescriptor])
 
   const insights = React.useMemo<InsightWithFormula[]>(() => {
-    if (!metrics) return []
+    if (!metrics) {
+      return []
+    }
 
     const result: InsightWithFormula[] = []
     const personnelExpenses = metrics.expenseBreakdown.personnelExpenses
@@ -313,19 +315,7 @@ export function AIInsights() {
     }
 
     return result
-  }, [metrics, financialInputs, roles, monthsOfPlannedHiring])
-
-  if (insights.length === 0) {
-    return (
-      <Card>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">
-            Add financial inputs and roles to see AI-powered insights and predictions.
-          </p>
-        </CardContent>
-      </Card>
-    )
-  }
+  }, [metrics, financialInputs, roles, monthsOfPlannedHiring, formatCurrency])
 
   const getIcon = (type: AIInsight["type"]) => {
     switch (type) {
@@ -362,12 +352,12 @@ export function AIInsights() {
     const warnings = insights.filter((insight) => insight.type === "warning")
     return [...critical, ...warnings]
   }, [insights])
-  const infoInsights = insights.filter(
-    (insight) => insight.type === "info"
-  )
-  const successInsights = insights.filter(
-    (insight) => insight.type === "success"
-  )
+  const infoInsights = React.useMemo(() => {
+    return insights.filter((insight) => insight.type === "info")
+  }, [insights])
+  const successInsights = React.useMemo(() => {
+    return insights.filter((insight) => insight.type === "success")
+  }, [insights])
 
   // State to track selected alert index
   const [selectedAlertIndex, setSelectedAlertIndex] = React.useState(0)
@@ -376,17 +366,23 @@ export function AIInsights() {
 
   // Ensure selected index is valid when alerts change
   React.useEffect(() => {
-    if (alertInsights.length > 0 && selectedAlertIndex >= alertInsights.length) {
-      setSelectedAlertIndex(0)
-    }
-  }, [alertInsights.length, selectedAlertIndex])
+    setSelectedAlertIndex((prevIndex) => {
+      if (alertInsights.length > 0 && prevIndex >= alertInsights.length) {
+        return 0
+      }
+      return prevIndex
+    })
+  }, [alertInsights.length])
 
   // Ensure selected index is valid when info insights change
   React.useEffect(() => {
-    if (infoInsights.length > 0 && selectedInfoIndex >= infoInsights.length) {
-      setSelectedInfoIndex(0)
-    }
-  }, [infoInsights.length, selectedInfoIndex])
+    setSelectedInfoIndex((prevIndex) => {
+      if (infoInsights.length > 0 && prevIndex >= infoInsights.length) {
+        return 0
+      }
+      return prevIndex
+    })
+  }, [infoInsights.length])
 
   const handlePreviousAlert = () => {
     setSelectedAlertIndex((prev) => (prev > 0 ? prev - 1 : alertInsights.length - 1))
@@ -505,9 +501,14 @@ export function AIInsights() {
     <div className="space-y-4">
       <Card>
         <CardContent>
-          <div className="space-y-4">
-            {/* Alerts Section - Collapsible with cycling */}
-            {alertInsights.length > 0 && (
+          {insights.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              Add financial inputs and roles to see AI-powered insights and predictions.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {/* Alerts Section - Collapsible with cycling */}
+              {alertInsights.length > 0 && (
               <Accordion type="single" collapsible defaultValue="alerts" className="w-full">
                 <AccordionItem value="alerts" className="border-none">
                   <AccordionTrigger className="py-2 hover:no-underline">
@@ -614,13 +615,14 @@ export function AIInsights() {
               </Accordion>
             )}
 
-            {/* Success insights */}
-            {successInsights.length > 0 && (
-              <div className="space-y-4">
-                {successInsights.map((insight) => renderInsightCard(insight))}
-              </div>
-            )}
-          </div>
+              {/* Success insights */}
+              {successInsights.length > 0 && (
+                <div className="space-y-4">
+                  {successInsights.map((insight) => renderInsightCard(insight))}
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -39,7 +39,7 @@ export function HiringOverviewTable() {
   const editingRole = roles.find((role) => role.id === editingRoleId)
 
   if (roles.length === 0) {
-    return null
+    return <div className="border rounded-xl p-4 text-center text-muted-foreground text-sm">No roles to display</div>
   }
 
   return (
