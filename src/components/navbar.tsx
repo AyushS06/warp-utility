@@ -3,7 +3,6 @@
 import * as React from "react"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { CurrencySelector } from "@/components/currency-selector"
 
 export function Navbar() {
   return (
@@ -24,7 +23,6 @@ export function Navbar() {
           <span className="text-xl font-semibold">Headcount planner</span>
         </Link>
         <div className="flex items-center gap-2">
-          <CurrencySelector />
           <ThemeToggle />
         </div>
       </div>

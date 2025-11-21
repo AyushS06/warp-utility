@@ -33,6 +33,7 @@ import { calculatorFormSchema, type CalculatorFormValues } from "@/lib/schemas/c
 import { AddRoleForm } from "@/components/hiring/add-role-form"
 import { MonthlyHiringBoard } from "@/components/hiring/monthly-board"
 import { ExportPdfPreview } from "@/components/export-pdf-preview"
+import { CurrencySelector } from "@/components/currency-selector"
 import { formatCurrency as formatCurrencyUtil } from "@/lib/currency"
 
 export default function Home() {
@@ -518,7 +519,8 @@ export default function Home() {
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">Headcount planner</h1>
             <p className="text-muted-foreground">Build scenarios and watch runway updates in real-time.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <CurrencySelector />
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
