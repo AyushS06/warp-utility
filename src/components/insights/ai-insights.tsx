@@ -45,7 +45,7 @@ export function AIInsights() {
   const metrics = state.metrics
   const financialInputs = state.financialInputs
   const roles = state.roles
-  
+
   const formatCurrency = React.useCallback(
     (value: number) => formatCurrencyUtil(value, state.currency),
     [state.currency]
