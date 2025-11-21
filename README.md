@@ -148,3 +148,9 @@ All financial inputs, hiring plans, and settings are automatically saved to brow
 ## License
 
 Private project for Warp take-home assessment.
+
+## Research Notes
+
+- Started by collecting raw financial metrics from the Gusto burn rate calculator CSV template. Fed the CSV into ChatGPT to extract definitions and formulas that informed the data cards, insights, and KPIs.
+- Added a `shadCN` and Radix UI MCP integration to Cursor, plus an `AGENTS.md` reference file that pointed Cursor to the ChatGPT research doc.
+- Specified UI requirements up front (card types, chart components, number animations, Lucide icons, typography inspired by Warp) so the front-end implementation matched the intended design system.
