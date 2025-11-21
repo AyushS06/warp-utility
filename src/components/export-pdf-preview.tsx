@@ -58,8 +58,8 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] w-[95vw] h-[95vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-[99vw] max-h-[99vh] w-[99vw] h-[99vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>PDF Preview</DialogTitle>
           <DialogDescription>
             Sign up with warp to share your report with your team!
@@ -67,13 +67,13 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
         </DialogHeader>
 
         {/* PDF Preview Content */}
-        <div className="bg-white dark:bg-card rounded-lg border-2 border-border shadow-lg p-12">
+        <div className="bg-white dark:bg-card rounded-lg border-2 border-border shadow-lg p-8 min-w-[1200px] flex-1 overflow-y-auto">
           {/* Header */}
-          <div className="mb-8 pb-6 border-b border-border">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+          <div className="mb-6 pb-4 border-b border-border">
+            <h1 className="text-2xl font-bold text-foreground mb-1">
               Headcount Planner Report
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Generated on {new Date().toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
@@ -83,44 +83,44 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
           </div>
 
           {/* Financial Summary */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">
+          <section className="mb-6">
+            <h2 className="text-xl font-semibold text-foreground mb-3">
               Financial Summary
             </h2>
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
                 <p className="text-sm text-muted-foreground">Cash on Hand</p>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground whitespace-nowrap">
                   {formatCurrency(state.financialInputs.totalCashOnHand)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Company Valuation</p>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground whitespace-nowrap">
                   {formatCurrency(state.financialInputs.companyValuation)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Monthly Existing Burn</p>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground whitespace-nowrap">
                   {formatCurrency(state.financialInputs.monthlyExistingBurn)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Expected Monthly Revenue</p>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground whitespace-nowrap">
                   {formatCurrency(state.financialInputs.expectedMonthlyRevenue)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Target Runway</p>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground whitespace-nowrap">
                   {formatNumber(state.financialInputs.targetRunwayMonths, 0)} months
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Contingency Buffer</p>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground whitespace-nowrap">
                   {formatNumber(state.financialInputs.contingencyBufferPercent, 0)}%
                 </p>
               </div>
@@ -132,10 +132,10 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
             <h2 className="text-2xl font-semibold text-foreground mb-4">
               Key Metrics
             </h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-6">
               <div className="p-4 bg-muted rounded">
                 <p className="text-sm text-muted-foreground mb-1">Total Monthly Burn</p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-bold text-foreground whitespace-nowrap">
                   {formatCurrency(metrics.totalMonthlyBurn)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -146,7 +146,7 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
                 <p className="text-sm text-muted-foreground mb-1">
                   Fully Loaded Cost / Role
                 </p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-bold text-foreground whitespace-nowrap">
                   {formatCurrency(avgFullyLoadedCost)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -157,7 +157,7 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
                 <p className="text-sm text-muted-foreground mb-1">
                   Total Annual Hiring Cost
                 </p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-bold text-foreground whitespace-nowrap">
                   {formatCurrency(metrics.totalAnnualHiringCost)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -166,7 +166,7 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
               </div>
               <div className="p-4 bg-muted rounded">
                 <p className="text-sm text-muted-foreground mb-1">Remaining Runway</p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-bold text-foreground whitespace-nowrap">
                   {metrics.remainingRunwayMonths === Infinity
                     ? "∞"
                     : `${formatNumber(metrics.remainingRunwayMonths, 1)} months`}
@@ -180,7 +180,7 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
                   <p className="text-sm text-muted-foreground mb-1">
                     Runway Ends (Month)
                   </p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-2xl font-bold text-foreground whitespace-nowrap">
                     Month {runwayEndMonth}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -192,7 +192,7 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
                 <p className="text-sm text-muted-foreground mb-1">
                   Max Hires (Target Runway)
                 </p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-bold text-foreground whitespace-nowrap">
                   {formatNumber(metrics.maxHiresForTargetRunway, 0)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -209,25 +209,25 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
                 Hiring Plan
               </h2>
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
+                <table className="w-full border-collapse min-w-full">
                   <thead>
                     <tr className="border-b border-gray-300 dark:border-gray-700">
-                      <th className="text-left py-2 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <th className="text-left py-3 px-6 text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[200px]">
                         Role
                       </th>
-                      <th className="text-left py-2 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <th className="text-left py-3 px-6 text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[150px]">
                         Location
                       </th>
-                      <th className="text-right py-2 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <th className="text-right py-3 px-6 text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[100px]">
                         Headcount
                       </th>
-                      <th className="text-right py-2 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <th className="text-right py-3 px-6 text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[150px]">
                         Base Salary
                       </th>
-                      <th className="text-right py-2 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <th className="text-right py-3 px-6 text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[180px]">
                         Monthly Cost
                       </th>
-                      <th className="text-right py-2 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <th className="text-right py-3 px-6 text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[180px]">
                         Annual Cost
                       </th>
                     </tr>
@@ -244,24 +244,24 @@ export function ExportPdfPreview({ open, onOpenChange }: ExportPdfPreviewProps) 
                           key={role.id}
                           className="border-b border-gray-200 dark:border-gray-800"
                         >
-                          <td className="py-2 px-4 text-sm text-gray-900 dark:text-gray-100">
+                          <td className="py-3 px-6 text-sm text-gray-900 dark:text-gray-100">
                             {role.title}
                           </td>
-                          <td className="py-2 px-4 text-sm text-gray-600 dark:text-gray-400">
+                          <td className="py-3 px-6 text-sm text-gray-600 dark:text-gray-400">
                             {location?.label || "Unknown"}
                           </td>
-                          <td className="py-2 px-4 text-sm text-right text-gray-900 dark:text-gray-100">
+                          <td className="py-3 px-6 text-sm text-right text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             {role.headcount}
                           </td>
-                          <td className="py-2 px-4 text-sm text-right text-gray-900 dark:text-gray-100">
+                          <td className="py-3 px-6 text-sm text-right text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             {formatCurrency(role.baseSalary)}
                           </td>
-                          <td className="py-2 px-4 text-sm text-right text-gray-900 dark:text-gray-100">
+                          <td className="py-3 px-6 text-sm text-right text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             {roleCost
                               ? formatCurrency(roleCost.monthlyFullyLoadedCost * role.headcount)
                               : "-"}
                           </td>
-                          <td className="py-2 px-4 text-sm text-right text-gray-900 dark:text-gray-100">
+                          <td className="py-3 px-6 text-sm text-right text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             {roleCost
                               ? formatCurrency(roleCost.annualFullyLoadedCost * role.headcount)
                               : "-"}
